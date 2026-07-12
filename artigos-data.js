@@ -1,7 +1,7 @@
 /* Lista de artigos do blog — gerada pelo Painel Administrativo. */
 const ARTIGOS = [
   {
-    "id": "mrhe3mc6",
+    "id": "mrhek6xw",
     "titulo": "O maior erro que faz voce terminar o dia sem concluir o que realmente importa",
     "categoria": "Produtividade",
     "numero": "#001",
