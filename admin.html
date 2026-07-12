@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel Administrativo — Tempo Inteligente Blog</title>
+<style>
+  :root{
+    --verde:#0A9C74;--verde-escuro:#075E45;--creme:#F4F1E9;--papel:#fff;
+    --tinta:#232722;--cinza:#6D7268;--borda:#DDD9CC;--erro:#C0392B;--sucesso:#1F8A4C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--creme);color:var(--tinta);line-height:1.5;padding-bottom:60px;}
+  header{background:var(--verde-escuro);color:#fff;padding:16px 18px;}
+  header h1{font-size:1.05rem;font-weight:700;}
+  header p{font-size:.76rem;opacity:.85;margin-top:2px;}
+
+  .wrap{max-width:640px;margin:0 auto;padding:16px;}
+
+  /* ===== Config ===== */
+  .config-box{
+    background:var(--papel);border:1px solid var(--borda);border-radius:10px;
+    padding:16px;margin-bottom:16px;
+  }
+  .config-box h2{font-size:.92rem;margin-bottom:4px;}
+  .config-box p{font-size:.78rem;color:var(--cinza);margin-bottom:12px;}
+  .config-status{
+    display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:700;margin-bottom:10px;
+  }
+  .dot-status{width:9px;height:9px;border-radius:50%;background:var(--erro);flex-shrink:0;}
+  .dot-status.ok{background:var(--sucesso);}
+  .config-fields{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .config-fields.show{display:flex;}
+  .config-fields label{font-size:.76rem;font-weight:700;color:var(--cinza);}
+  .config-fields input{
+    border:1.5px solid var(--borda);border-radius:7px;padding:9px 10px;font-size:.86rem;
+    font-family:inherit;width:100%;
+  }
+  .btn-link{background:none;border:none;color:var(--verde-escuro);font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:underline;padding:0;}
+
+  /* ===== Tabs ===== */
+  .tabs{display:flex;gap:8px;margin-bottom:16px;}
+  .tab-btn{
+    flex:1;padding:11px;border-radius:8px;border:1.5px solid var(--borda);
+    background:var(--papel);font-weight:700;font-size:.86rem;color:var(--cinza);cursor:pointer;
+  }
+  .tab-btn.ativo{background:var(--verde-escuro);color:#fff;border-color:var(--verde-escuro);}
+  .tab-view{display:none;}
+  .tab-view.ativo{display:block;}
+
+  /* ===== Lista ===== */
+  .lista-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .lista-head h2{font-size:.92rem;}
+  .btn-novo{
+    background:var(--verde);color:#fff;border:none;border-radius:7px;
+    padding:9px 14px;font-weight:700;font-size:.82rem;cursor:pointer;
+  }
+  .item-card{
+    background:var(--papel);border:1px solid var(--borda);border-radius:9px;
+    padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:center;
+  }
+  .item-card img{width:50px;height:50px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--creme);}
+  .item-info{flex:1;min-width:0;}
+  .item-info b{display:block;font-size:.84rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .item-info span{font-size:.74rem;color:var(--cinza);}
+  .item-acoes{display:flex;gap:6px;flex-shrink:0;}
+  .item-acoes button{
+    border:1.5px solid var(--borda);background:#fff;border-radius:6px;
+    padding:6px 9px;font-size:.72rem;font-weight:700;cursor:pointer;color:var(--tinta);
+  }
+  .item-acoes button.excluir{color:var(--erro);border-color:var(--erro);}
+  .vazio-lista{text-align:center;padding:30px 10px;color:var(--cinza);font-size:.86rem;}
+
+  /* ===== Formulário ===== */
+  .form-box{
+    background:var(--papel);border:1px solid var(--borda);border-radius:10px;
+    padding:16px;margin-bottom:16px;display:none;
+  }
+  .form-box.show{display:block;}
+  .form-box h2{font-size:.94rem;margin-bottom:14px;}
+  .campo{margin-bottom:12px;}
+  .campo label{display:block;font-size:.78rem;font-weight:700;color:var(--cinza);margin-bottom:5px;}
+  .campo input, .campo select, .campo textarea{
+    width:100%;border:1.5px solid var(--borda);border-radius:7px;padding:9px 10px;
+    font-size:.88rem;font-family:inherit;color:var(--tinta);background:#fff;
+  }
+  .campo textarea{resize:vertical;min-height:80px;}
+  .campo-linha{display:flex;gap:10px;}
+  .campo-linha .campo{flex:1;}
+  .preview-img{width:100%;max-height:160px;object-fit:contain;border-radius:7px;margin-top:8px;background:var(--creme);display:none;}
+  .preview-img.show{display:block;}
+  .form-btns{display:flex;gap:8px;margin-top:16px;}
+  .btn-publicar{
+    flex:1;background:var(--verde-escuro);color:#fff;border:none;border-radius:8px;
+    padding:12px;font-weight:700;font-size:.88rem;cursor:pointer;
+  }
+  .btn-publicar:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-cancelar{
+    background:#fff;border:1.5px solid var(--borda);border-radius:8px;
+    padding:12px 16px;font-weight:700;font-size:.86rem;cursor:pointer;color:var(--cinza);
+  }
+
+  .status-msg{
+    margin-top:12px;padding:10px 12px;border-radius:7px;font-size:.82rem;font-weight:600;display:none;
+  }
+  .status-msg.show{display:block;}
+  .status-msg.info{background:#EAF3FF;color:#1B5FA8;}
+  .status-msg.erro{background:#FBEAEA;color:var(--erro);}
+  .status-msg.sucesso{background:#E9F7EE;color:var(--sucesso);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Painel Administrativo</h1>
+  <p>Blog Tempo Inteligente</p>
+</header>
+
+<div class="wrap">
+
+  <div class="config-box">
+    <div class="config-status">
+      <span class="dot-status" id="dotStatus"></span>
+      <span id="statusTexto">Não conectado ao GitHub</span>
+      <button class="btn-link" id="btnConfig" style="margin-left:auto;">Configurar</button>
+    </div>
+    <div class="config-fields" id="configFields">
+      <label>Token de acesso (GitHub)</label>
+      <input type="password" id="cfgToken" placeholder="ghp_xxxxxxxxxxxx">
+      <label>Usuário ou organização do GitHub</label>
+      <input type="text" id="cfgOwner" placeholder="ex: tempointeligente">
+      <label>Nome do repositório</label>
+      <input type="text" id="cfgRepo" placeholder="ex: blog">
+      <label>Branch</label>
+      <input type="text" id="cfgBranch" placeholder="main" value="main">
+      <button class="btn-publicar" id="btnSalvarConfig" style="margin-top:6px;">Salvar e conectar</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn ativo" data-tab="artigos">📰 Artigos</button>
+    <button class="tab-btn" data-tab="publicidade">📢 Publicidade</button>
+  </div>
+
+  <!-- ===================== ABA ARTIGOS ===================== -->
+  <div class="tab-view ativo" id="view-artigos">
+    <div class="lista-head">
+      <h2>Artigos publicados</h2>
+      <button class="btn-novo" id="btnNovoArtigo">+ Novo artigo</button>
+    </div>
+    <div id="listaArtigos"><div class="vazio-lista">Conecte-se ao GitHub para ver a lista.</div></div>
+
+    <div class="form-box" id="formArtigoBox">
+      <h2 id="formArtigoTitulo">Novo artigo</h2>
+      <input type="hidden" id="artigoEditId">
+
+      <div class="campo">
+        <label>Título</label>
+        <input type="text" id="fTitulo" placeholder="Ex: O maior erro que faz você perder tempo">
+      </div>
+
+      <div class="campo-linha">
+        <div class="campo">
+          <label>Categoria</label>
+          <input type="text" id="fCategoria" placeholder="Ex: Produtividade" list="listaCategorias">
+          <datalist id="listaCategorias">
+            <option value="Produtividade"><option value="Ferramentas"><option value="Hábitos"><option value="Inteligência Artificial">
+          </datalist>
+        </div>
+        <div class="campo">
+          <label>Número da edição</label>
+          <input type="text" id="fNumero" placeholder="#001">
+        </div>
+      </div>
+
+      <div class="campo-linha">
+        <div class="campo">
+          <label>Data</label>
+          <input type="date" id="fData">
+        </div>
+        <div class="campo">
+          <label>Tema de fundo</label>
+          <select id="fTema">
+            <option value="creme">Creme</option>
+            <option value="sage">Sage</option>
+            <option value="menta">Menta</option>
+            <option value="areia">Areia</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label>Resumo (aparece no card e ajuda o Google a entender o artigo)</label>
+        <textarea id="fResumo" placeholder="2 a 4 frases sobre o artigo — pode ser o parágrafo de abertura que você já escreveu na arte."></textarea>
+      </div>
+
+      <div class="campo">
+        <label>Imagem do artigo (a arte completa do Canva)</label>
+        <input type="file" id="fImagem" accept="image/*">
+        <img class="preview-img" id="previewArtigo">
+      </div>
+
+      <div class="form-btns">
+        <button class="btn-cancelar" id="btnCancelarArtigo">Cancelar</button>
+        <button class="btn-publicar" id="btnPublicarArtigo">Publicar artigo</button>
+      </div>
+      <div class="status-msg" id="statusArtigo"></div>
+    </div>
+  </div>
+
+  <!-- ===================== ABA PUBLICIDADE ===================== -->
+  <div class="tab-view" id="view-publicidade">
+    <div class="lista-head">
+      <h2>Anúncios ativos</h2>
+      <button class="btn-novo" id="btnNovoAnuncio">+ Novo anúncio</button>
+    </div>
+    <div id="listaAnuncios"><div class="vazio-lista">Conecte-se ao GitHub para ver a lista.</div></div>
+
+    <div class="form-box" id="formAnuncioBox">
+      <h2 id="formAnuncioTitulo">Novo anúncio</h2>
+      <input type="hidden" id="anuncioEditId">
+
+      <div class="campo">
+        <label>Nome do anunciante</label>
+        <input type="text" id="aNome" placeholder="Ex: Notion">
+      </div>
+      <div class="campo">
+        <label>Texto curto (descrição da oferta)</label>
+        <input type="text" id="aTexto" placeholder="Ex: Organize sua vida em um só lugar">
+      </div>
+      <div class="campo">
+        <label>Link de destino</label>
+        <input type="url" id="aLink" placeholder="https://...">
+      </div>
+      <div class="campo">
+        <label>Imagem / logo do anunciante</label>
+        <input type="file" id="aImagem" accept="image/*">
+        <img class="preview-img" id="previewAnuncio">
+      </div>
+
+      <div class="form-btns">
+        <button class="btn-cancelar" id="btnCancelarAnuncio">Cancelar</button>
+        <button class="btn-publicar" id="btnPublicarAnuncio">Publicar anúncio</button>
+      </div>
+      <div class="status-msg" id="statusAnuncio"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===================== Utilidades ===================== */
+const $ = s => document.querySelector(s);
+
+function b64EncodeUnicode(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function b64DecodeUnicode(str){
+  return decodeURIComponent(escape(atob(str.replace(/\n/g,''))));
+}
+function fileParaBase64(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function hoje(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function mostrarStatus(el, tipo, texto){
+  el.className = 'status-msg show ' + tipo;
+  el.textContent = texto;
+}
+function esconderStatus(el){
+  el.className = 'status-msg';
+}
+
+/* ===================== Configuração / conexão GitHub ===================== */
+let CFG = JSON.parse(localStorage.getItem('ti_admin_cfg') || 'null');
+
+function atualizarStatusConexao(){
+  const ok = !!(CFG && CFG.token && CFG.owner && CFG.repo);
+  $('#dotStatus').classList.toggle('ok', ok);
+  $('#statusTexto').textContent = ok
+    ? `Conectado: ${CFG.owner}/${CFG.repo}`
+    : 'Não conectado ao GitHub';
+  return ok;
+}
+
+$('#btnConfig').addEventListener('click', () => {
+  $('#configFields').classList.toggle('show');
+  if(CFG){
+    $('#cfgToken').value = CFG.token || '';
+    $('#cfgOwner').value = CFG.owner || '';
+    $('#cfgRepo').value = CFG.repo || '';
+    $('#cfgBranch').value = CFG.branch || 'main';
+  }
+});
+
+$('#btnSalvarConfig').addEventListener('click', () => {
+  CFG = {
+    token: $('#cfgToken').value.trim(),
+    owner: $('#cfgOwner').value.trim(),
+    repo: $('#cfgRepo').value.trim(),
+    branch: $('#cfgBranch').value.trim() || 'main'
+  };
+  localStorage.setItem('ti_admin_cfg', JSON.stringify(CFG));
+  $('#configFields').classList.remove('show');
+  atualizarStatusConexao();
+  carregarArtigos();
+  carregarAnuncios();
+});
+
+/* ===================== Chamadas à API do GitHub ===================== */
+async function ghGet(path){
+  const url = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${path}?ref=${CFG.branch}`;
+  const res = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${CFG.token}`, 'Accept': 'application/vnd.github+json' }
+  });
+  if(res.status === 404) return null;
+  if(!res.ok) throw new Error(`Erro ao ler ${path} (${res.status})`);
+  const data = await res.json();
+  return { conteudo: b64DecodeUnicode(data.content), sha: data.sha };
+}
+
+async function ghPut(path, conteudoTexto, sha, mensagem){
+  const url = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${path}`;
+  const body = {
+    message: mensagem,
+    content: b64EncodeUnicode(conteudoTexto),
+    branch: CFG.branch
+  };
+  if(sha) body.sha = sha;
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${CFG.token}`,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok){
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.message || `Erro ao publicar ${path} (${res.status})`);
+  }
+  return res.json();
+}
+
+function extrairArray(conteudoJS, nomeVariavel){
+  const re = new RegExp(nomeVariavel + '\\s*=\\s*(\\[[\\s\\S]*?\\]);');
+  const m = conteudoJS.match(re);
+  if(!m) return [];
+  try { return JSON.parse(m[1]); } catch(e){ return []; }
+}
+function montarArquivoJS(nomeVariavel, comentarioTopo, array){
+  return comentarioTopo + '\nconst ' + nomeVariavel + ' = ' + JSON.stringify(array, null, 2) + ';\n';
+}
+
+const COMENTARIO_ARTIGOS = `/* Lista de artigos do blog — gerada pelo Painel Administrativo. */`;
+const COMENTARIO_ANUNCIOS = `/* Lista de anúncios do blog — gerada pelo Painel Administrativo. */`;
+
+/* ===================== Abas ===================== */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
+    document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    $('#view-' + btn.dataset.tab).classList.add('ativo');
+  });
+});
+
+/* ===================== ARTIGOS ===================== */
+let artigosAtual = [];
+let artigosSha = null;
+let imagemArtigoBase64 = null;
+
+async function carregarArtigos(){
+  if(!atualizarStatusConexao()) return;
+  $('#listaArtigos').innerHTML = '<div class="vazio-lista">Carregando…</div>';
+  try{
+    const r = await ghGet('artigos-data.js');
+    if(!r){ artigosAtual = []; artigosSha = null; }
+    else { artigosAtual = extrairArray(r.conteudo, 'ARTIGOS'); artigosSha = r.sha; }
+    renderListaArtigos();
+  } catch(e){
+    $('#listaArtigos').innerHTML = `<div class="vazio-lista">Erro ao carregar: ${e.message}</div>`;
+  }
+}
+
+function renderListaArtigos(){
+  if(artigosAtual.length === 0){
+    $('#listaArtigos').innerHTML = '<div class="vazio-lista">Nenhum artigo publicado ainda.</div>';
+    return;
+  }
+  $('#listaArtigos').innerHTML = artigosAtual.map(a => `
+    <div class="item-card">
+      <img src="${a.imagem}" alt="">
+      <div class="item-info"><b>${a.titulo}</b><span>${a.numero} · ${a.categoria}</span></div>
+      <div class="item-acoes">
+        <button onclick="editarArtigo('${a.id}')">Editar</button>
+        <button class="excluir" onclick="excluirArtigo('${a.id}')">Excluir</button>
+      </div>
+    </div>`).join('');
+}
+
+function proximoNumero(){
+  let max = 0;
+  artigosAtual.forEach(a => {
+    const n = parseInt((a.numero||'').replace(/\D/g,''), 10);
+    if(!isNaN(n) && n > max) max = n;
+  });
+  return '#' + String(max+1).padStart(3,'0');
+}
+
+function abrirFormArtigo(){
+  $('#formArtigoBox').classList.add('show');
+  $('#btnNovoArtigo').style.display = 'none';
+  esconderStatus($('#statusArtigo'));
+}
+function fecharFormArtigo(){
+  $('#formArtigoBox').classList.remove('show');
+  $('#btnNovoArtigo').style.display = '';
+  $('#artigoEditId').value = '';
+  $('#fTitulo').value = ''; $('#fCategoria').value = ''; $('#fNumero').value = '';
+  $('#fData').value = ''; $('#fTema').value = 'creme'; $('#fResumo').value = '';
+  $('#fImagem').value = ''; $('#previewArtigo').classList.remove('show');
+  imagemArtigoBase64 = null;
+}
+
+$('#btnNovoArtigo').addEventListener('click', () => {
+  fecharFormArtigo();
+  $('#formArtigoTitulo').textContent = 'Novo artigo';
+  $('#fNumero').value = proximoNumero();
+  $('#fData').value = hoje();
+  abrirFormArtigo();
+});
+$('#btnCancelarArtigo').addEventListener('click', fecharFormArtigo);
+
+window.editarArtigo = function(id){
+  const a = artigosAtual.find(x => x.id === id);
+  if(!a) return;
+  fecharFormArtigo();
+  $('#formArtigoTitulo').textContent = 'Editar artigo';
+  $('#artigoEditId').value = a.id;
+  $('#fTitulo').value = a.titulo;
+  $('#fCategoria').value = a.categoria;
+  $('#fNumero').value = a.numero;
+  $('#fData').value = a.dataISO;
+  $('#fTema').value = a.tema || 'creme';
+  $('#fResumo').value = a.resumo;
+  imagemArtigoBase64 = a.imagem;
+  $('#previewArtigo').src = a.imagem;
+  $('#previewArtigo').classList.add('show');
+  abrirFormArtigo();
+};
+
+window.excluirArtigo = async function(id){
+  if(!confirm('Remover este artigo do blog? Essa ação não pode ser desfeita.')) return;
+  artigosAtual = artigosAtual.filter(a => a.id !== id);
+  await salvarArtigos('Remove artigo ' + id);
+};
+
+$('#fImagem').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  imagemArtigoBase64 = await fileParaBase64(file);
+  $('#previewArtigo').src = imagemArtigoBase64;
+  $('#previewArtigo').classList.add('show');
+});
+
+$('#btnPublicarArtigo').addEventListener('click', async () => {
+  const statusEl = $('#statusArtigo');
+  if(!atualizarStatusConexao()){ mostrarStatus(statusEl,'erro','Configure a conexão com o GitHub primeiro.'); return; }
+
+  const titulo = $('#fTitulo').value.trim();
+  const categoria = $('#fCategoria').value.trim();
+  const numero = $('#fNumero').value.trim();
+  const dataISO = $('#fData').value;
+  const resumo = $('#fResumo').value.trim();
+  const tema = $('#fTema').value;
+  const editId = $('#artigoEditId').value;
+
+  if(!titulo || !categoria || !numero || !dataISO || !resumo || !imagemArtigoBase64){
+    mostrarStatus(statusEl, 'erro', 'Preencha todos os campos e escolha uma imagem.');
+    return;
+  }
+
+  const id = editId || (Date.now().toString(36));
+  const novoItem = { id, titulo, categoria, numero, dataISO, resumo, tema, imagem: imagemArtigoBase64 };
+
+  if(editId){
+    artigosAtual = artigosAtual.map(a => a.id === editId ? novoItem : a);
+  } else {
+    artigosAtual.push(novoItem);
+  }
+
+  await salvarArtigos((editId ? 'Edita' : 'Publica') + ' artigo ' + numero);
+});
+
+async function salvarArtigos(mensagem){
+  const statusEl = $('#statusArtigo');
+  $('#btnPublicarArtigo').disabled = true;
+  mostrarStatus(statusEl, 'info', 'Publicando no GitHub…');
+  try{
+    const conteudo = montarArquivoJS('ARTIGOS', COMENTARIO_ARTIGOS, artigosAtual);
+    await ghPut('artigos-data.js', conteudo, artigosSha, mensagem);
+    mostrarStatus(statusEl, 'sucesso', 'Publicado! Pode levar 1-2 minutos para aparecer no site.');
+    fecharFormArtigo();
+    setTimeout(() => carregarArtigos(), 800);
+  } catch(e){
+    mostrarStatus(statusEl, 'erro', 'Falhou: ' + e.message);
+  } finally {
+    $('#btnPublicarArtigo').disabled = false;
+  }
+}
+
+/* ===================== PUBLICIDADE ===================== */
+let anunciosAtual = [];
+let anunciosSha = null;
+let imagemAnuncioBase64 = null;
+
+async function carregarAnuncios(){
+  if(!atualizarStatusConexao()) return;
+  $('#listaAnuncios').innerHTML = '<div class="vazio-lista">Carregando…</div>';
+  try{
+    const r = await ghGet('publicidade-data.js');
+    if(!r){ anunciosAtual = []; anunciosSha = null; }
+    else { anunciosAtual = extrairArray(r.conteudo, 'ANUNCIOS'); anunciosSha = r.sha; }
+    renderListaAnuncios();
+  } catch(e){
+    $('#listaAnuncios').innerHTML = `<div class="vazio-lista">Erro ao carregar: ${e.message}</div>`;
+  }
+}
+
+function renderListaAnuncios(){
+  if(anunciosAtual.length === 0){
+    $('#listaAnuncios').innerHTML = '<div class="vazio-lista">Nenhum anúncio ativo.</div>';
+    return;
+  }
+  $('#listaAnuncios').innerHTML = anunciosAtual.map(a => `
+    <div class="item-card">
+      <img src="${a.imagem}" alt="">
+      <div class="item-info"><b>${a.nome}</b><span>${a.texto}</span></div>
+      <div class="item-acoes">
+        <button onclick="editarAnuncio('${a.id}')">Editar</button>
+        <button class="excluir" onclick="excluirAnuncio('${a.id}')">Excluir</button>
+      </div>
+    </div>`).join('');
+}
+
+function abrirFormAnuncio(){
+  $('#formAnuncioBox').classList.add('show');
+  $('#btnNovoAnuncio').style.display = 'none';
+  esconderStatus($('#statusAnuncio'));
+}
+function fecharFormAnuncio(){
+  $('#formAnuncioBox').classList.remove('show');
+  $('#btnNovoAnuncio').style.display = '';
+  $('#anuncioEditId').value = '';
+  $('#aNome').value = ''; $('#aTexto').value = ''; $('#aLink').value = '';
+  $('#aImagem').value = ''; $('#previewAnuncio').classList.remove('show');
+  imagemAnuncioBase64 = null;
+}
+
+$('#btnNovoAnuncio').addEventListener('click', () => {
+  fecharFormAnuncio();
+  $('#formAnuncioTitulo').textContent = 'Novo anúncio';
+  abrirFormAnuncio();
+});
+$('#btnCancelarAnuncio').addEventListener('click', fecharFormAnuncio);
+
+window.editarAnuncio = function(id){
+  const a = anunciosAtual.find(x => x.id === id);
+  if(!a) return;
+  fecharFormAnuncio();
+  $('#formAnuncioTitulo').textContent = 'Editar anúncio';
+  $('#anuncioEditId').value = a.id;
+  $('#aNome').value = a.nome;
+  $('#aTexto').value = a.texto;
+  $('#aLink').value = a.link;
+  imagemAnuncioBase64 = a.imagem;
+  $('#previewAnuncio').src = a.imagem;
+  $('#previewAnuncio').classList.add('show');
+  abrirFormAnuncio();
+};
+
+window.excluirAnuncio = async function(id){
+  if(!confirm('Remover este anúncio?')) return;
+  anunciosAtual = anunciosAtual.filter(a => a.id !== id);
+  await salvarAnuncios('Remove anúncio ' + id);
+};
+
+$('#aImagem').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  imagemAnuncioBase64 = await fileParaBase64(file);
+  $('#previewAnuncio').src = imagemAnuncioBase64;
+  $('#previewAnuncio').classList.add('show');
+});
+
+$('#btnPublicarAnuncio').addEventListener('click', async () => {
+  const statusEl = $('#statusAnuncio');
+  if(!atualizarStatusConexao()){ mostrarStatus(statusEl,'erro','Configure a conexão com o GitHub primeiro.'); return; }
+
+  const nome = $('#aNome').value.trim();
+  const texto = $('#aTexto').value.trim();
+  const link = $('#aLink').value.trim();
+  const editId = $('#anuncioEditId').value;
+
+  if(!nome || !texto || !link || !imagemAnuncioBase64){
+    mostrarStatus(statusEl, 'erro', 'Preencha todos os campos e escolha uma imagem.');
+    return;
+  }
+
+  const id = editId || (Date.now().toString(36));
+  const novoItem = { id, nome, texto, link, imagem: imagemAnuncioBase64 };
+
+  if(editId){
+    anunciosAtual = anunciosAtual.map(a => a.id === editId ? novoItem : a);
+  } else {
+    anunciosAtual.push(novoItem);
+  }
+
+  await salvarAnuncios((editId ? 'Edita' : 'Publica') + ' anúncio ' + nome);
+});
+
+async function salvarAnuncios(mensagem){
+  const statusEl = $('#statusAnuncio');
+  $('#btnPublicarAnuncio').disabled = true;
+  mostrarStatus(statusEl, 'info', 'Publicando no GitHub…');
+  try{
+    const conteudo = montarArquivoJS('ANUNCIOS', COMENTARIO_ANUNCIOS, anunciosAtual);
+    await ghPut('publicidade-data.js', conteudo, anunciosSha, mensagem);
+    mostrarStatus(statusEl, 'sucesso', 'Publicado! Pode levar 1-2 minutos para aparecer no site.');
+    fecharFormAnuncio();
+    setTimeout(() => carregarAnuncios(), 800);
+  } catch(e){
+    mostrarStatus(statusEl, 'erro', 'Falhou: ' + e.message);
+  } finally {
+    $('#btnPublicarAnuncio').disabled = false;
+  }
+}
+
+/* ===================== Início ===================== */
+atualizarStatusConexao();
+if(CFG){ carregarArtigos(); carregarAnuncios(); }
+</script>
+</body>
+</html>
